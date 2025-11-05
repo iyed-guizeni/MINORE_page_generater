@@ -57,4 +57,4 @@ pnpm dev
    Visit `http://localhost:3000`
 
 ##  Try It Live 
-** [Launch MINORE Now](https://minore-page-generater.vercel.app)**  
+** [Try MINORE Now](https://minore-page-generater.vercel.app)**  
