@@ -70,7 +70,7 @@ export async function generateCode(
               role: "user",
               parts: [
                 {
-                  text: `You are a React component generator. Generate a React component based on the user's description. Return ONLY the code, starting with 'use client' if needed. Use Tailwind CSS for styling. Ensure the code is production-ready and functional. Do NOT include any additional explanation, thinking, or comments—just the code.\n\nGenerate a React component for: ${userPrompt}`,
+                  text: `You are a React component generator. Generate a React component based on the user's description. Return ONLY the code, starting with 'use client' if needed and not javascript. Use Tailwind CSS for styling. Ensure the code is production-ready and functional. Do NOT include any additional explanation, thinking, or comments—just the code.\n\nGenerate a React component for: ${userPrompt}`,
                 },
               ],
             },

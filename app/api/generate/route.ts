@@ -8,22 +8,32 @@ import { generateCode } from "@/lib/groq-service";
 import { validateGeneratedCode, getErrorMessage } from "@/lib/code-sanitizer";
 
 export const runtime = "nodejs";
+
 function cleanReactCode(response: any) {
-  // Remove any markdown fences and 'use client' lines
+  // Remove language identifiers (javascript:, jsx:, tsx:, etc.)
   let cleanedResponse = response
-    .replace(/```tsx/g, '')                // Remove opening TSX code fences if they exist
-    .replace(/```jsx/g, '')                // Remove opening JSX code fences if they exist
-    .replace(/```/g, '')                   // Remove closing code fences
-    .replace(/'use client'/, '')            // Remove the 'use client' directive if present
-    .trim();                               // Trim any surrounding whitespace
-  
-  // Remove any lingering 'tsx' or other type metadata from the top
-  cleanedResponse = cleanedResponse.replace(/^tsx/i, '').trim();
+    .replace(/^(javascript|jsx|tsx|javascript jsx|js|typescript)[\s:]*/i, "") // Remove language tags at start
+    .replace(/^["']?use client["']?;?\n*/i, "") // Remove 'use client' directive
+    .replace(/```tsx\n?/g, "") // Remove opening TSX code fences
+    .replace(/```jsx\n?/g, "") // Remove opening JSX code fences
+    .replace(/```javascript\n?/g, "") // Remove opening JavaScript fences
+    .replace(/```js\n?/g, "") // Remove opening JS fences
+    .replace(/```\n?/g, "") // Remove generic code fences
+    .trim();
+
+  // Remove any remaining language metadata
+  cleanedResponse = cleanedResponse
+    .replace(/^(tsx|jsx|javascript|js|typescript)\s*/i, "")
+    .trim();
+
+  // Remove trailing code fence if it exists
+  cleanedResponse = cleanedResponse.replace(/```\s*$/g, "").trim();
+
+  // Remove empty lines at the beginning
+  cleanedResponse = cleanedResponse.replace(/^\s*\n+/, "").trim();
 
   return cleanedResponse;
 }
-
-
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     const { code, error } = await generateCode(prompt);
     const cleanCode = cleanReactCode(code);
-    console.log("cleanCode",cleanCode);
+    console.log("cleanCode", cleanCode);
 
     console.log("generateCode returned:", {
       hasCode: !!code,
